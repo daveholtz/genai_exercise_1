@@ -100,11 +100,15 @@ def main():
         st.write(task_content)
         
         # Extract and display the image
-        image_path = parts[1].strip()[2:-1]  # Remove (./ and )
+        image_path = parts[1].strip()[1:-1]  # Remove parentheses but keep the full path
         try:
+            # Make sure we're using the correct path separator and clean the path
+            image_path = image_path.replace('(', '').replace(')', '').strip()
+            st.write(f"Debug: Attempting to load image from: {image_path}")  # Debug line
             st.image(image_path)
         except Exception as e:
             st.error(f"Could not load image: {image_path}")
+            st.error(f"Error details: {str(e)}")
     else:
         # Original handling for non-image questions
         title_end = current_question.find('\n')
