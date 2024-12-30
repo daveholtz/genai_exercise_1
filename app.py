@@ -3,79 +3,16 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 import os
-
-# Course tasks
-QUESTIONS = [
-    """Search for each of the following six major generative text-based language models—GPT-4, PaLM 2, LLaMA 2, Claude 2, DeepSeek 3—please provide:
-1. The organization responsible for its development
-2. The year it was first publicly introduced
-3. Whether it is open-source or closed access
-4. Its approximate number of parameters (if publicly disclosed)
-5. The context window size (i.e., maximum size of inputs)""",
-    """Logical puzzle - Cal Alumni:
-Chris Pine, Ashley Judd, Aaron Rodgers, Ashley Judd
-Cal Landmarks: Sather Tower, Doe Library, Memorial Glade, Sproul Plaza
-Times of Day: Morning, Noon, Afternoon, Evening
-
-Each alumnus visited exactly one of the landmarks at a distinct time of day.
-Clues:
-1. Aaron Rodgers did not visit in the morning, and he did not visit Memorial Glade.
-2. The person who visited Sather Tower did so in the morning.
-3. Ashley Judd visited sometime after the person who went to Doe Library but before the person who went to Sproul Plaza.
-4. Ashley Judd visited earlier in the day than Aaron Rodgers.
-5. The person who visited Memorial Glade did not go at noon.
-6. Chris Pine visited Sproul Plaza.
-
-Goal: Determine each alumnus's landmark and the time of day they visited.""",
-    """Math/probability:
-Imagine there are three generative AI research teams:
-1. Team A: Produces two text-to-image models (image-focused models).
-2. Team B: Produces two text-to-text models (language-focused models).
-3. Team C: Produces one text-to-image model (image-focused) and one text-to-text model (language-focused).
-
-You randomly choose one of these teams and evaluate one of their models. The model happens to be a text-to-image model. What is the probability that the other model produced by the same team is also a text-to-image model?""",
-    "Creative writing: Pretend you are Alan Turing. Write an elevator pitch for yourself in 150 words or less.",
-    "Creative marketing: Brainstorm a name and slogan for an advertising company that uses generative AI to source its images.",
-    """Technical Writing: How many grammatical/spelling errors are there in the passage below?
-
-[Long passage about generative AI with intentional errors]""",
-    """Reading comprehension:
-[Passage about automation and efficiency]
-
-Which of the following can be inferred from the passage about errors in manufacturing?
-(A) They are an unavoidable problem in traditional manufacturing systems.
-(B) They are the most important problem to fix through automation.
-(C) They are an essential element for success when switching to automation from traditional manufacturing.
-(D) They are a phenomenon found more often in traditional manufacturing than in automated manufacturing.
-(E) They are an obstacle to increased efficiency and lower costs in traditional production.""",
-    """Strategy: You are the Head of Strategy for ShopSmart, a mid-size retail chain specializing in affordable, everyday essentials. Your CEO is eager to integrate Generative AI into the company's operations to improve customer engagement and operational efficiency.
-
-You have been tasked with developing a high-level plan for deploying Generative AI within the next 12 months. Outline your strategy by selecting one primary use case for Generative AI based on ShopSmart's priorities and justifying why:
-a) Personalized marketing campaigns using AI-generated content.
-b) Virtual shopping assistants to enhance online customer support.
-c) AI-driven demand forecasting to optimize inventory.""",
-    """Data Analysis: Using the provided csv file with a list of companies in the Bay Area, please tell us:
-1. What is the median founding year?
-2. What percentage of companies are in San Francisco?
-3. How many companies are in Oakland?
-4. How many companies are backed by Y Combinator and not in San Francisco?""",
-    """Language Translation: Translate the following sentences into Spanish and Mandarin. Ensure the translations are accurate and maintain the meaning of the original text.
-1. At Haas, learning happens both inside and outside the classroom.
-2. Berkeley's campus is famous for its eucalyptus trees.
-3. The rise of generative AI has sparked debates about intellectual property""",
-    "Explain to a layperson (in less than 150 words) what vector embedding is.",
-    "Visual Pattern Recognition: [Image will be provided]",
-]
-
+from questions import QUESTIONS
 
 def save_answer(email, question_number, answer):
-    # Create a dictionary with the new answer
-    new_answer = {
-        "email": [email],  # Make values lists to create proper DataFrame row
+    # Create a new answer as a DataFrame directly
+    new_answer = pd.DataFrame({
+        "email": [email],
         "question_number": [question_number],
         "answer": [answer],
-        "submitted_at": [datetime.now()],
-    }
+        "submitted_at": [datetime.now()]
+    })
 
     # Load existing answers or create new DataFrame
     try:
@@ -89,11 +26,11 @@ def save_answer(email, question_number, answer):
     mask = (df["email"] == email) & (df["question_number"] == question_number)
     if mask.any():
         # Update existing row
-        for col, val in new_answer.items():
-            df.loc[mask, col] = val[0]  # Use the first value from each list
+        for col in df.columns:
+            df.loc[mask, col] = new_answer[col].iloc[0]
     else:
-        # Append new row
-        df = pd.concat([df, pd.DataFrame(new_answer)], ignore_index=True)
+        # Append new row using concat with explicit dtypes
+        df = pd.concat([df, new_answer], ignore_index=True)
 
     # Save to CSV
     df.to_csv("answers.csv", index=False)
@@ -146,9 +83,36 @@ def main():
             else:
                 st.error("Please submit an answer before moving to the next question.")
 
-    # Display current question and answer box
-    st.subheader(f"Question {st.session_state.current_question + 1}:")
-    st.write(QUESTIONS[st.session_state.current_question])
+    # Display current question number and task title in large format
+    current_question = QUESTIONS[st.session_state.current_question]
+    
+    # Check if the question contains an image marker
+    if "![Image]" in current_question:
+        # Split the question into text and image parts
+        parts = current_question.split("![Image]")
+        
+        # Display the text part
+        title_end = parts[0].find('\n')
+        task_title = parts[0][:title_end].strip()
+        task_content = parts[0][title_end:].strip()
+        
+        st.markdown(f"<h1 style='text-align: center;'>{task_title}</h1>", unsafe_allow_html=True)
+        st.write(task_content)
+        
+        # Extract and display the image
+        image_path = parts[1].strip()[2:-1]  # Remove (./ and )
+        try:
+            st.image(image_path)
+        except Exception as e:
+            st.error(f"Could not load image: {image_path}")
+    else:
+        # Original handling for non-image questions
+        title_end = current_question.find('\n')
+        task_title = current_question[:title_end].strip()
+        task_content = current_question[title_end:].strip()
+        
+        st.markdown(f"<h1 style='text-align: center;'>{task_title}</h1>", unsafe_allow_html=True)
+        st.write(task_content)
 
     # Get existing answer if any
     existing_answers = get_user_answers(email)
