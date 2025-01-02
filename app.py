@@ -7,6 +7,9 @@ from questions import QUESTIONS
 import json
 from typing import Dict, Any
 from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()  # This loads the environment variables from .env file
 
 
 def save_answer(email, question_number, answer):
@@ -120,8 +123,17 @@ def main():
 
     # Email-based authentication
     email = st.text_input("Enter your email address:")
-    if not email:
-        st.warning("Please enter your email address to continue.")
+    password = st.text_input("Enter password:", type="password")
+
+    if not email or not password:
+        st.warning("Please enter both email and password to continue.")
+        return
+
+    # Add your desired password here
+    CORRECT_PASSWORD = os.getenv("PASSWORD")
+
+    if password != CORRECT_PASSWORD:
+        st.error("Incorrect password. Please try again.")
         return
 
     # Get the last answered question for this user
