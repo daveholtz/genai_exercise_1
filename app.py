@@ -255,34 +255,13 @@ def main():
         key=f"model_{st.session_state.current_question}",
     )
 
-    # Parameter controls
-    col1, col2 = st.columns(2)
-    with col1:
-        temperature = st.slider(
-            "Temperature",
-            0.0,
-            2.0,
-            1.0,
-            key=f"temp_{st.session_state.current_question}",
-        )
-        max_tokens = st.slider(
-            "Max Tokens",
-            1,
-            4096,
-            2048,
-            key=f"tokens_{st.session_state.current_question}",
-        )
-    with col2:
-        top_p = st.slider(
-            "Top P", 0.0, 1.0, 1.0, key=f"top_p_{st.session_state.current_question}"
-        )
-        presence_penalty = st.slider(
-            "Presence Penalty",
-            -2.0,
-            2.0,
-            0.0,
-            key=f"presence_{st.session_state.current_question}",
-        )
+    # Set powerful default parameters
+    parameters = {
+        "model": model,
+        "temperature": 0.7,  # Balanced creativity and consistency
+        "top_p": 0.9,  # High but not maximum diversity
+        "presence_penalty": 0.1,  # Slight penalty to reduce repetition
+    }
 
     # Prompt input
     prompt = st.text_area(
@@ -297,24 +276,10 @@ def main():
             st.error("Please enter a prompt")
         else:
             try:
-                # Collect parameters
-                parameters = {
-                    "model": model,
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                    "top_p": top_p,
-                    "presence_penalty": presence_penalty,
-                }
-
                 # Make API call
                 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
                 response = client.chat.completions.create(
-                    messages=[{"role": "user", "content": prompt}],
-                    model=model,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    top_p=top_p,
-                    presence_penalty=presence_penalty,
+                    messages=[{"role": "user", "content": prompt}], **parameters
                 )
 
                 # Get response text from the new response format
