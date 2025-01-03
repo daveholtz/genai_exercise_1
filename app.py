@@ -19,8 +19,6 @@ from src.ai.playground import get_ai_response
 
 
 def main():
-    st.title("Berkeley Haas: AI For Business Leaders (EWMBA295T.6)")
-
     # Initialize session state
     if "current_question" not in st.session_state:
         st.session_state.current_question = 0
@@ -45,6 +43,50 @@ def main():
     # Use stored email for all subsequent operations
     email = st.session_state.user_email
 
+    # AI Settings in sidebar
+    with st.sidebar:
+        st.markdown("### AI Settings")
+        # AI assistance selector
+        ai_assistance = st.radio(
+            "Select AI Assistance Level:",
+            ["No AI Assistance", "Legacy AI Model", "Higher Capability Model"],
+            key=f"ai_assistance_{st.session_state.current_question}",
+        )
+
+        # AI Playground
+        if ai_assistance != "No AI Assistance":
+            st.markdown("### AI Playground")
+            prompt = st.text_area(
+                "Enter your prompt:",
+                height=100,
+                key=f"prompt_{st.session_state.current_question}",
+                value="",
+            )
+
+            if st.button("Run", key=f"run_{st.session_state.current_question}"):
+                if not prompt.strip():
+                    st.error("Please enter a prompt")
+                else:
+                    try:
+                        response_text, parameters = get_ai_response(
+                            prompt, ai_assistance
+                        )
+                        st.markdown("### Response:")
+                        st.write(response_text)
+
+                        save_playground_interaction(
+                            email,
+                            st.session_state.current_question,
+                            prompt,
+                            parameters,
+                            response_text,
+                        )
+                    except Exception as e:
+                        st.error(f"Error: {str(e)}")
+
+    # Main content
+    st.title("Berkeley Haas: AI For Business Leaders (EWMBA295T.6)")
+
     # Get the last answered question for this user
     last_answered = get_last_answered_question(email)
 
@@ -62,13 +104,6 @@ def main():
     # Display current question
     current_question = QUESTIONS[st.session_state.current_question]
     display_question(current_question)
-
-    # AI assistance selector
-    ai_assistance = st.radio(
-        "Select AI Assistance Level:",
-        ["No AI Assistance", "Legacy AI Model", "Higher Capability Model"],
-        key=f"ai_assistance_{st.session_state.current_question}",
-    )
 
     # Get existing answer if any
     existing_answers = get_user_answers(email)
@@ -117,35 +152,6 @@ def main():
 
     # Show progress
     display_progress(last_answered, len(QUESTIONS))
-
-    # AI Playground
-    if ai_assistance != "No AI Assistance":
-        st.markdown("### AI Playground")
-        prompt = st.text_area(
-            "Enter your prompt:",
-            height=100,
-            key=f"prompt_{st.session_state.current_question}",
-            value="",
-        )
-
-        if st.button("Run", key=f"run_{st.session_state.current_question}"):
-            if not prompt.strip():
-                st.error("Please enter a prompt")
-            else:
-                try:
-                    response_text, parameters = get_ai_response(prompt, ai_assistance)
-                    st.markdown("### Response:")
-                    st.write(response_text)
-
-                    save_playground_interaction(
-                        email,
-                        st.session_state.current_question,
-                        prompt,
-                        parameters,
-                        response_text,
-                    )
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
 
 
 if __name__ == "__main__":
