@@ -1,6 +1,7 @@
+from datetime import datetime
+from io import StringIO
 import pandas as pd
 import json
-from datetime import datetime
 from typing import Dict, Any
 from ..config import (
     S3_BUCKET,
@@ -26,36 +27,30 @@ def save_answer(email: str, question_number: int, answer: str) -> None:
             "email": [email],
             "question_number": [question_number],
             "answer": [answer],
-            "submitted_at": [datetime.now()],
+            "submitted_at": [datetime.now().isoformat()],
         }
     )
 
-    # Get existing answers if any
     try:
+        # Try to get existing answers
         response = s3_client.get_object(
             Bucket=S3_BUCKET, Key=f"{ANSWERS_PREFIX}{email}_answers.csv"
         )
         df = pd.read_csv(io.BytesIO(response["Body"].read()))
-    except:
-        df = pd.DataFrame(
-            columns=["email", "question_number", "answer", "submitted_at"],
-            dtype={
-                "email": str,
-                "question_number": int,
-                "answer": str,
-                "submitted_at": str,
-            },
-        )
 
-    mask = (df["email"] == email) & (df["question_number"] == question_number)
-    if mask.any():
-        for col in df.columns:
-            df.loc[mask, col] = new_answer[col].iloc[0]
-    else:
-        df = pd.concat([df, new_answer], ignore_index=True)
+        # Update existing answer or append new one
+        mask = (df["email"] == email) & (df["question_number"] == question_number)
+        if mask.any():
+            for col in df.columns:
+                df.loc[mask, col] = new_answer[col].iloc[0]
+        else:
+            df = pd.concat([df, new_answer], ignore_index=True)
+    except:
+        # If file doesn't exist, use the new answer DataFrame
+        df = new_answer
 
     # Save to S3
-    csv_buffer = io.StringIO()
+    csv_buffer = StringIO()
     df.to_csv(csv_buffer, index=False)
     s3_client.put_object(
         Bucket=S3_BUCKET,
@@ -93,41 +88,32 @@ def save_playground_interaction(
     response: str,
 ) -> None:
     """Save a playground interaction."""
-    interaction = pd.DataFrame(
+    new_interaction = pd.DataFrame(
         [
             {
                 "email": email,
                 "question_number": question_number,
                 "prompt": prompt,
-                "parameters": json.dumps(parameters),  # Convert dict to JSON string
+                "parameters": json.dumps(parameters),
                 "response": response,
                 "timestamp": datetime.now().isoformat(),
             }
         ]
     )
 
-    # Get existing interactions if any
     try:
+        # Try to get existing interactions
         response = s3_client.get_object(
             Bucket=S3_BUCKET, Key=f"{PLAYGROUND_PREFIX}{email}_interactions.csv"
         )
         interactions = pd.read_csv(io.BytesIO(response["Body"].read()))
+        interactions = pd.concat([interactions, new_interaction], ignore_index=True)
     except:
-        interactions = pd.DataFrame(
-            columns=[
-                "email",
-                "question_number",
-                "prompt",
-                "parameters",
-                "response",
-                "timestamp",
-            ]
-        )
-
-    interactions = pd.concat([interactions, interaction], ignore_index=True)
+        # If file doesn't exist, use the new interaction DataFrame
+        interactions = new_interaction
 
     # Save to S3
-    csv_buffer = io.StringIO()
+    csv_buffer = StringIO()
     interactions.to_csv(csv_buffer, index=False)
     s3_client.put_object(
         Bucket=S3_BUCKET,
@@ -139,13 +125,28 @@ def save_playground_interaction(
 def get_playground_interactions(email: str = None) -> pd.DataFrame:
     """Retrieve playground interactions, optionally filtered by email."""
     try:
-        response = s3_client.get_object(
-            Bucket=S3_BUCKET, Key=f"{PLAYGROUND_PREFIX}{email}_interactions.csv"
-        )
-        df = pd.read_csv(io.BytesIO(response["Body"].read()))
-
         if email:
-            df = df[df["email"] == email]
+            # Get interactions for specific user
+            response = s3_client.get_object(
+                Bucket=S3_BUCKET, Key=f"{PLAYGROUND_PREFIX}{email}_interactions.csv"
+            )
+            df = pd.read_csv(io.BytesIO(response["Body"].read()))
+        else:
+            # Get all interactions (admin mode)
+            # List all interaction files
+            response = s3_client.list_objects_v2(
+                Bucket=S3_BUCKET, Prefix=PLAYGROUND_PREFIX
+            )
+            all_interactions = []
+            for obj in response.get("Contents", []):
+                file_response = s3_client.get_object(Bucket=S3_BUCKET, Key=obj["Key"])
+                df = pd.read_csv(io.BytesIO(file_response["Body"].read()))
+                all_interactions.append(df)
+
+            if not all_interactions:
+                return pd.DataFrame()
+
+            df = pd.concat(all_interactions, ignore_index=True)
 
         # Convert JSON string back to dict and normalize
         df["parameters"] = df["parameters"].apply(json.loads)
@@ -153,5 +154,6 @@ def get_playground_interactions(email: str = None) -> pd.DataFrame:
         df = pd.concat([df.drop("parameters", axis=1), params_df], axis=1)
 
         return df
-    except:
+    except Exception as e:
+        print(f"Error retrieving playground interactions: {str(e)}")
         return pd.DataFrame()
