@@ -81,7 +81,12 @@ def main():
             current_answer = answer_row.iloc[0]["answer"]
 
     # Answer input
-    answer = st.text_area("Your Answer:", value=current_answer, height=200)
+    answer = st.text_area(
+        "Your Answer:",
+        value=current_answer,
+        height=200,
+        key=f"answer_input_{st.session_state.current_question}",
+    )
 
     if st.button("Submit Answer"):
         if answer.strip():
@@ -89,6 +94,20 @@ def main():
                 save_answer(email, st.session_state.current_question, answer)
                 st.success("Answer submitted successfully!")
                 if st.session_state.current_question < len(QUESTIONS) - 1:
+                    if (
+                        f"answer_input_{st.session_state.current_question + 1}"
+                        in st.session_state
+                    ):
+                        del st.session_state[
+                            f"answer_input_{st.session_state.current_question + 1}"
+                        ]
+                    if (
+                        f"prompt_{st.session_state.current_question + 1}"
+                        in st.session_state
+                    ):
+                        del st.session_state[
+                            f"prompt_{st.session_state.current_question + 1}"
+                        ]
                     st.session_state.current_question += 1
                     st.rerun()
             else:
@@ -99,24 +118,6 @@ def main():
     # Show progress
     display_progress(last_answered, len(QUESTIONS))
 
-    # View all answers
-    if st.checkbox("View all my answers"):
-        display_answer_history(get_user_answers(email), QUESTIONS)
-
-    # Add download button for answers
-    if st.checkbox("Download my answers"):
-        user_answers = get_user_answers(email)
-        if not user_answers.empty:
-            csv = user_answers.to_csv(index=False)
-            st.download_button(
-                label="Download CSV",
-                data=csv,
-                file_name=f"answers_{email}.csv",
-                mime="text/csv",
-            )
-        else:
-            st.info("No answers to download yet.")
-
     # AI Playground
     if ai_assistance != "No AI Assistance":
         st.markdown("### AI Playground")
@@ -124,6 +125,7 @@ def main():
             "Enter your prompt:",
             height=100,
             key=f"prompt_{st.session_state.current_question}",
+            value="",
         )
 
         if st.button("Run", key=f"run_{st.session_state.current_question}"):
@@ -144,29 +146,6 @@ def main():
                     )
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
-
-    # Add playground interactions download section
-    st.markdown("### Download Playground History")
-    download_options = st.radio(
-        "Choose what to download:",
-        ["My interactions only", "All interactions (admin only)"],
-    )
-
-    if st.button("Download Playground History"):
-        interactions_df = get_playground_interactions(
-            email if download_options == "My interactions only" else None
-        )
-        display_playground_history(interactions_df)
-
-        if not interactions_df.empty:
-            csv = interactions_df.to_csv(index=False)
-            filename = f"playground_history{'_' + email if download_options == 'My interactions only' else '_all'}.csv"
-            st.download_button(
-                label="Download CSV",
-                data=csv,
-                file_name=filename,
-                mime="text/csv",
-            )
 
 
 if __name__ == "__main__":
