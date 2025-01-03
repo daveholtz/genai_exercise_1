@@ -1,30 +1,25 @@
 QUESTIONS = [
-    """Task 1: Search
+    """Task 1: Logical Puzzle
 
-For each of the following six major generative text-based language models—GPT-4, PaLM 2, LLaMA 2, Claude 2, DeepSeek 3—please provide:
-1. The organization responsible for its development
-2. The year it was first publicly introduced
-3. Whether it is open-source or closed access
-4. Its approximate number of parameters (if publicly disclosed)
-5. The context window size (i.e., maximum size of inputs)""",
-    """Task 2: Logical Puzzle
+Cal Alumni: Chris Pine, Brenda Song, Aaron Rodgers, Ashley Judd
 
-Cal Alumni: Chris Pine, Ashley Judd, Aaron Rodgers, Ashley Judd
 Cal Landmarks: Sather Tower, Doe Library, Memorial Glade, Sproul Plaza
+
 Times of Day: Morning, Noon, Afternoon, Evening
 
 Each alumnus visited exactly one of the landmarks at a distinct time of day.
 
 Clues:
+
 1. Aaron Rodgers did not visit in the morning, and he did not visit Memorial Glade.
 2. The person who visited Sather Tower did so in the morning.
-3. Ashley Judd visited sometime after the person who went to Doe Library but before the person who went to Sproul Plaza.
-4. Ashley Judd visited earlier in the day than Aaron Rodgers.
+3. Ashley Judd visited sometime after the person who went to Doe Library but before the person who went to Sproul Plaza. (Order: Doe Library < Ashley Judd < Sproul Plaza)
+4. Brenda Song visited earlier in the day than Aaron Rodgers.
 5. The person who visited Memorial Glade did not go at noon.
 6. Chris Pine visited Sproul Plaza.
 
-Goal: Determine each alumnus's landmark and the time of day they visited.""",
-    """Task 3: Math/Probability
+Goal: Determine each alumnus’s landmark and the time of day they visited.""",
+    """Task 2: Math/Probability
 
 Imagine there are three generative AI research teams:
 1. Team A: Produces two text-to-image models (image-focused models).
@@ -32,111 +27,42 @@ Imagine there are three generative AI research teams:
 3. Team C: Produces one text-to-image model (image-focused) and one text-to-text model (language-focused).
 
 You randomly choose one of these teams and evaluate one of their models. The model happens to be a text-to-image model. What is the probability that the other model produced by the same team is also a text-to-image model?""",
-    """Task 4: Creative Writing
+    """Task 3: Visual Pattern Recognition
 
-Pretend you are Alan Turing. Write an elevator pitch for yourself in 150 words or less.""",
-    """Task 5: Creative Marketing
+Each training example below shows a pair of inputs and outputs where a specific transformation has been applied to the blocks. Your task is to determine the rule governing the transformation and apply it to the new test input to generate the correct output.
 
-Brainstorm a name and slogan for an advertising company that uses generative AI to source its images.""",
-    """Task 6: Technical Writing
+Option 1: To make the output, you have to create a 3x3 matrix and fill it with green color. Next, transfer the purple pattern to the 3x3 matrix. Then, overlay the gray pattern on top of the purple pattern. After that, fill in the green squares with turquoise color and fill in all the purple and gray squares with green color.
 
-How many grammatical/spelling errors are there in the passage below?
+Option 2: To make the output, you have to create a 3x3 matrix and fill it with black color. Next, transfer the brown pattern to the 3x3 matrix. Then, overlay the blue pattern on top of the brown pattern. After that, fill in the black squares with red color and fill in all the brown and blue squares with black color.
 
-*Generative AI refers to a class of artificial intelligence models capable of producing content rather than simply analyzing or recognizing existing data. Unlike traditional machine learning algorithms that classify or predict outcomes, generative AI models learn patterns from extensive datasets and then use these patterns to create new text, images, audio, and even video. One of the most prominent examples of generative AI is the text-based language model. These models, trained on billions of words, can produce coherent paragraphs, answer complex questions, and assist in tasks ranging from drafting emails to writing long-form articles.*
+Option 3: To make the output, you have to create a 3x3 matrix and fill it with white color. Next, transfer the red pattern to the 3x3 matrix. Then, overlay the green pattern on top of the red pattern. After that, fill in the white squares with black color and fill in all the red and green squares with white color.
 
-*The capabilities of generative AI have grown exponentially over the past few years. Initially, such models struggled with coherence and context, often producing nonsensical or repetitive outputs. However, advancements in model architectures, training techniques, and compute power have led to systems that can generate remarkably convincing and contextually relevant content. These improvements have not only enhanced the quality of outputs but also broadened their applicability across industries. From creative writing and marketing content generation to customer service chatbots and educational tools, generative AI has become an integral asset in numerous professional environments.*
+![Image](images/task_3.png)
+""",
+    """Task 4: Search
 
-*One of the most celebrated breakthroughs in generative AI is the development of models that can transform input text into relevant, visually coherent imagery. By learning from massive datasets of images paired with descriptive text, these models can create entirely new illustrations that align with a given prompt. Similarly, text-to-speech and speech-to-text models create significantly improved capabilities, enabling real-time transcription and highly natural-sounding audio responses. As a result, content creators and businesses are increasingly integrating generative AI into their workflows, using it to streamline production, enhance user experiences, and foster innovation.*
+For each of the following five major generative text-based language models—GPT-4, PaLM 2, LLaMA 2, Claude 2, DeepSeek 3—please provide:
 
-*Despite these remarkable advances, generative AI still faces several challenges. Among the most pressing concerns are the risks of producing biased or harmful content. Since these models learn from historical data, any prejudices or misleading patterns present in the training sets may be reproduced in their outputs. Additionally, the proliferation of deepfakes—ultra-realistic yet fabricated media generated by these systems—raises ethical and security questions. To address these issues, researchers and policymakers are exploring new strategies to enhance model interpretability, reduce bias, and establish guidelines and regulations that ensure responsible use of these technologies.*
+1. The organization responsible for its development 
+2. The year it was first publicly introduced
+3. Whether it is open-source or closed access
+4. Its MMLU benchmark score
+5. Its GPQA benchmark score""",
 
-*Looking to the future, generative AI stands on the brink of even more transformative developments. Improvements in efficiency, scalability, and multimodal understanding will further expand the range of possibilities. We may soon witness AI systems capable of generating complex, interactive narratives that blur the boundaries between author and audience. In tandem with careful governance and user education, this technology can serve as a powerful catalyst for creativity, communication, and progress. Ultimately, generative AI represents not just another tool in the evolving landscape of digital technology, but a profound leap forward in our ability to shape, share, and understand information in entirely new ways. By embracing these innovations, we stand at a pivotal moment in history, poised to redefine the relationship between human and machine creativity. The future of generative AI, while still uncertain, holds the promise of reshaping how we think, collaborate, and communicate for generations to come.*""",
-    """Task 7: Reading comprehension
-*While there is no fixed model for lowering costs and increasing efficiency in different businesses, automation is one choice that has proved successful in the United States.*
 
-*In industries well suited for automation – ranging from retail and banking to semiconductor and auto manufacturing – the gains in efficiency from switching from traditional to automated manufacturing and automated processes have been remarkable.*
-
-*Consider the situation today for a bank dispersing cash: forty years ago it actually cost the bank to distribute money all day to customers; today those same banks reap millions in ATM fees from machines that cost very little to operate.*
-
-*Likewise, consider the time and cost to produce one Ford automobile before the implementation of robotic assembly lines compared to the time and cost today.*
-
-*Automation has not only lowered operation costs through decreased labor expenses, but also increased efficiency in almost every aspect of production.*
-
-*At companies like Amazon, the handling time for packaging and shipping products has been reduced by over 40%.*
-
-*At GE Medical, which manufactures products that require high levels of precision, errors in manufacturing that were common in the days of mostly human production are now virtually non-existent.*
-
-*In industries that require work in dangerous environments, the time to complete a particular job has decreased by up to 60%, since time-consuming (and expensive) safety processes can be avoided.*
-
-*While most of this improved efficiency has come about because of gains from the actual robotic machinery, the employees themselves have accounted for some of this improvement.*
-
-*In tasks that require particularly difficult or monotonous work, robots free up workers to focus on higher-level oversight jobs for which they get greater satisfaction.*
-
-*This leads to a more productive and efficient workforce, adding to the gains from the automation itself.*
-
-*Because of examples like these, some business analysts have suggested that widespread automation across all industries would provide a needed acceleration to the struggling productivity numbers in the U.S.*
-
-*Yet they miss the important wisdom of John Kenneth Galbraith: "it is a wise economist who recognizes the scope of his own generalizations."*
-
-*While automation is the right solution for many businesses, there remains a necessity for human insight and flexible decision-making in many types of manufacturing businesses for which automation has been recommended.*
-
-*Automation is often the correct choice, but it might actually yield a further decline in productivity numbers if not implemented selectively and appropriately.*
-
-Which of the following can be inferred from the passage about errors in manufacturing?
-
-(A) They are an unavoidable problem in traditional manufacturing systems.
-
-(B) They are the most important problem to fix through automation.
-
-(C) They are an essential element for success when switching to automation from traditional manufacturing.
-
-(D) They are a phenomenon found more often in traditional manufacturing than in automated manufacturing.
-
-(E) They are an obstacle to increased efficiency and lower costs in traditional production.""",
-
-"""Task 8: Strategy
-
-You are the Head of Strategy for ShopSmart, a mid-size retail chain specializing in affordable, everyday essentials. Your CEO is eager to integrate Generative AI into the company's operations to improve customer engagement and operational efficiency.
-
-You have been tasked with developing a high-level plan for deploying Generative AI within the next 12 months. Outline your strategy by selecting one primary use case for Generative AI based on ShopSmart's priorities and justifying why:
-a) Personalized marketing campaigns using AI-generated content.
-b) Virtual shopping assistants to enhance online customer support.
-c) AI-driven demand forecasting to optimize inventory.""",
-
-"""Task 9: Data Analysis
-
-Using the provided csv file with a list of companies in the Bay Area, please tell us:
-1. What is the median founding year?
-2. What percentage of companies are in San Francisco?
-3. How many companies are in Oakland?
-4. How many companies are backed by Y Combinator and not in San Francisco?""",
-    """Task 10: Language Translation
-
-Translate the following sentences into Spanish and Mandarin. Ensure the translations are accurate and maintain the meaning of the original text.
-1. At Haas, learning happens both inside and outside the classroom.
-2. Berkeley's campus is famous for its eucalyptus trees.
-3. The rise of generative AI has sparked debates about intellectual property""",
-    """Task 11: Vector Embedding Explanation
-
-Explain to a layperson (in less than 150 words) what vector embedding is.""",
-    """Task 12: Visual Pattern Recognition
-
-Which option should go in the bottom right corner?
-
-![Image](images/task_12.png)""",
-    """Task 13: Customer Service
+    """Task 5: Writing
 
 Draft a professional email responding to the following customer complaint:
 
-Dear Customer Support Team,
+*Dear OpenAI Support Team,*
 
-I am writing to express my dissatisfaction with a recent order (Order #12345) I placed on December 15th. The package arrived late, on December 19th, even though I selected expedited shipping. To make matters worse, I received the wrong item—a blue jacket instead of the red sweater I ordered.
+*I’m writing to share my frustration about a service outage with ChatGPT on December 20th, which lasted from 2 PM to 6 PM EST. I was relying on ChatGPT to help prepare for an important presentation, and the downtime completely disrupted my workflow. As a result, I missed a deadline to submit my slides.*
 
-I was counting on this delivery for a special occasion, and this mix-up has caused significant inconvenience. I expect a prompt resolution to this issue. Please let me know how you plan to address it.
+*What made the situation even more stressful was the lack of timely updates. I checked the OpenAI status page and social media, but I couldn’t find any clear communication about what was going on.*
 
-Thank you,
-Sam Altman""",
-    """Task 14: Code Challenge
+*I’d like to know what caused the outage, what steps OpenAI is taking to ensure this doesn’t happen again, and if you offer any compensation for the disruption.*
 
-Ask ChatGPT to write a python script for a simple random password generator. Test it here: https://www.online-python.com/""",
+*Best regards,*  
+*Avery Collins*"""
+
 ]
