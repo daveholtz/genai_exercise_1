@@ -115,7 +115,7 @@ def get_playground_interactions(email=None):
 
 
 def main():
-    st.title("Course Q&A Platform")
+    st.title("Berkeley Haas: AI For Business Leaders (EWMBA295T.6)")
 
     # Initialize session state
     if "current_question" not in st.session_state:
@@ -194,6 +194,13 @@ def main():
         )
         st.write(task_content)
 
+    # Add AI assistance selector
+    ai_assistance = st.radio(
+        "Select AI Assistance Level:",
+        ["No AI Assistance", "Legacy AI Model", "Higher Capability Model"],
+        key=f"ai_assistance_{st.session_state.current_question}",
+    )
+
     # Get existing answer if any
     existing_answers = get_user_answers(email)
     current_answer = ""
@@ -257,59 +264,60 @@ def main():
         else:
             st.info("No answers to download yet.")
 
-    # Add playground interface
-    st.markdown("### AI Playground")
+    # Only show AI Playground if AI assistance is selected
+    if ai_assistance != "No AI Assistance":
+        st.markdown("### AI Playground")
 
-    # Model selection
-    model = st.selectbox(
-        "Select Model",
-        ["gpt-4o", "gpt-4o-mini"],
-        key=f"model_{st.session_state.current_question}",
-    )
+        # Set model based on selection
+        model = (
+            "gpt-3.5-turbo-0125"
+            if ai_assistance == "Legacy AI Model"
+            else "gpt-4o-2024-08-06"
+        )
 
-    # Set powerful default parameters
-    parameters = {
-        "model": model,
-        "temperature": 0.7,  # Balanced creativity and consistency
-        "top_p": 0.9,  # High but not maximum diversity
-        "presence_penalty": 0.1,  # Slight penalty to reduce repetition
-    }
+        # Set parameters with fixed model
+        parameters = {
+            "model": model,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "presence_penalty": 0.1,
+        }
 
-    # Prompt input
-    prompt = st.text_area(
-        "Enter your prompt:",
-        height=100,
-        key=f"prompt_{st.session_state.current_question}",
-    )
+        # Prompt input
+        prompt = st.text_area(
+            "Enter your prompt:",
+            height=100,
+            key=f"prompt_{st.session_state.current_question}",
+        )
 
-    # Run button and response
-    if st.button("Run", key=f"run_{st.session_state.current_question}"):
-        if not prompt.strip():
-            st.error("Please enter a prompt")
-        else:
-            try:
-                # Make API call
-                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-                response = client.chat.completions.create(
-                    messages=[{"role": "user", "content": prompt}], **parameters
-                )
+        # Run button and response
+        if st.button("Run", key=f"run_{st.session_state.current_question}"):
+            if not prompt.strip():
+                st.error("Please enter a prompt")
+            else:
+                try:
+                    # Make API call
+                    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                    response = client.chat.completions.create(
+                        messages=[{"role": "user", "content": prompt}], **parameters
+                    )
 
-                # Get response text from the new response format
-                response_text = response.choices[0].message.content
-                st.markdown("### Response:")
-                st.write(response_text)
+                    # Get response text from the new response format
+                    response_text = response.choices[0].message.content
+                    st.markdown("### Response:")
+                    st.write(response_text)
 
-                # Save interaction
-                save_playground_interaction(
-                    email,
-                    st.session_state.current_question,
-                    prompt,
-                    parameters,
-                    response_text,
-                )
+                    # Save interaction
+                    save_playground_interaction(
+                        email,
+                        st.session_state.current_question,
+                        prompt,
+                        parameters,
+                        response_text,
+                    )
 
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
+                except Exception as e:
+                    st.error(f"Error: {str(e)}")
 
     # Add playground interactions download section
     st.markdown("### Download Playground History")
