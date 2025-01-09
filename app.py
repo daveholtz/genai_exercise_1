@@ -49,7 +49,7 @@ def main():
         # AI assistance selector
         ai_assistance = st.radio(
             "Select AI Assistance Level:",
-            ["No AI Assistance", "Legacy AI Model", "Higher Capability Model"],
+            ["No AI Assistance", "GPT-3.5-turbo", "GPT-4o"],
             key=f"ai_assistance_{st.session_state.current_question}",
         )
 
@@ -128,7 +128,15 @@ def main():
             if st.session_state.current_question <= last_answered + 1:
                 save_answer(email, st.session_state.current_question, answer)
                 st.success("Answer submitted successfully!")
-                if st.session_state.current_question < len(QUESTIONS) - 1:
+
+                # Check if this was the last question
+                if st.session_state.current_question == len(QUESTIONS) - 1:
+                    st.balloons()  # Add a celebratory effect
+                    st.success(
+                        "🎉 Congratulations! You have completed all questions. Thank you for your participation!"
+                    )
+                # If not the last question, proceed as before
+                elif st.session_state.current_question < len(QUESTIONS) - 1:
                     if (
                         f"answer_input_{st.session_state.current_question + 1}"
                         in st.session_state

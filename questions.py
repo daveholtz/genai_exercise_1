@@ -37,6 +37,8 @@ Option 2: To make the output, you have to create a 3x3 matrix and fill it with b
 
 Option 3: To make the output, you have to create a 3x3 matrix and fill it with white color. Next, transfer the red pattern to the 3x3 matrix. Then, overlay the green pattern on top of the red pattern. After that, fill in the white squares with black color and fill in all the red and green squares with white color.
 
+You can download the text friendly LLM instructions from [here](https://drive.google.com/file/d/10mt1B-Ch9xyuvjDOZlzlo6mG5l9cBlgx/view?usp=sharing).
+
 ![Image](images/task_3.png)
 """,
     """Task 4: Search
@@ -48,8 +50,6 @@ For each of the following five major generative text-based language models—GPT
 3. Whether it is open-source or closed access
 4. Its MMLU benchmark score
 5. Its GPQA benchmark score""",
-
-
     """Task 5: Writing
 
 Draft a professional email responding to the following customer complaint:
@@ -63,6 +63,5 @@ Draft a professional email responding to the following customer complaint:
 *I’d like to know what caused the outage, what steps OpenAI is taking to ensure this doesn’t happen again, and if you offer any compensation for the disruption.*
 
 *Best regards,*  
-*Avery Collins*"""
-
+*Avery Collins*""",
 ]
